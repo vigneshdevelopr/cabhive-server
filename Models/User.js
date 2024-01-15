@@ -2,36 +2,32 @@ import express from 'express'
 import mongoose from 'mongoose'
 import jwt from 'jsonwebtoken'
 const userSchema = new mongoose.Schema({
-    email:{
-        type: String,
+    mail:{
+        type: "string",
         required: true,
         unique: true,
-        maxlength: 35,
-        trim: true,
+        lowercase: true
     },
     firstname:{
         type:"string",
         required: true,
-        unique: true
     },
     lastname:{
         type:"string",
         required: true,
-        unique: true
     },
     password:{
         type:"string",
         required: true,
     },
-    refPerson:{
-        type:"string",
-        // required: true,
-        unique: true
-    },
+        refPerson:{
+            type:mongoose.SchemaTypes.ObjectId,
+            ref:'users',
+
+        },
     role:{
         type:"string",
         // required: true,
-        unique: true
     }
 },  { timestamps: true }
 )

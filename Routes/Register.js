@@ -16,7 +16,7 @@ router.get('/',async(req,res)=>{
 router.post("/register", async(req, res) => {
 
   try {
-    var userList = await userModel.findOne({email:req.body.email })
+    var userList = await userModel.findOne({mail:req.body.mail })
 
     if (userList)
       return res.status(409).send("User already Exists");
@@ -24,13 +24,27 @@ router.post("/register", async(req, res) => {
     //generate password:
     const salt = await bcrypt.genSalt(10);
     const hashPassword = await bcrypt.hash(req.body.password, salt);
+    let refPerson_id = req.body.refPerson;
 
+    // Check if refPerson_id is provided
+    if (!refPerson_id) {
+      return res.status(400).send('refPerson is required');
+    }
+    
+    // Check if the user with refPerson_id exists
+    const refPerson = await userModel.findOne({ mail: refPerson_id });
+    
+    if (!refPerson) {
+      console.log("refPerson not found");
+      return res.status(404).send('refPerson not found');
+    }
     userList = await new userModel({
-      email: req.body.email,
+      mail: req.body.mail,
       firstname: req.body.firstname,
       lastname: req.body.lastname,
       password: hashPassword,
-      role:req.body.role
+      role:req.body.role,
+      refPerson: refPerson._id
     }).save();
 
     const token = genAuthToken(userList._id);
